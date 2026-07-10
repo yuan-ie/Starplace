@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>STARPLACE — paint with stars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <div id="viewport" class="viewport">
+    <div id="stage" class="stage">
+      <canvas id="pixel-canvas"></canvas>
+      <canvas id="fx-canvas"></canvas>
+      <div id="cursor-cell" class="cursor-cell" hidden></div>
+    </div>
+  </div>
+
+  <!-- brand mark -->
+  <div class="brandmark">
+    <span class="brandmark__dot"></span>
+    <span class="brandmark__label">STARPLACE</span>
+  </div>
+
+  <!-- account panel: signed-out shows a Discord sign-in button, signed-in
+       shows avatar/username + sign out. Wrapped with the status panel
+       below so they stack automatically regardless of either one's
+       content height, instead of guessing a fixed pixel gap. -->
+  <div class="top-right-stack">
+    <div id="account-panel" class="panel panel--account">
+      <button id="signin-btn" class="signin-btn">
+        <svg class="signin-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.74 19.74 0 0 0-4.885 1.515.07.07 0 0 0-.032.027C.533 9.09-.32 13.579.099 18.011a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.006.127c-.598.35-1.22.647-1.873.892a.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.637-3.548-13.615a.061.061 0 0 0-.031-.028ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/>
+        </svg>
+        <span>Sign in with Discord</span>
+      </button>
+      <div id="account-identity" class="account-identity" hidden>
+        <img id="account-avatar" class="account-identity__avatar" alt="">
+        <span id="account-username" class="account-identity__name mono"></span>
+        <button id="signout-btn" class="account-identity__signout" title="Sign out">⏻</button>
+      </div>
+    </div>
+
+    <!-- status / charges panel -->
+    <div id="status-panel" class="panel panel--status">
+      <div class="panel__row">
+        <span class="panel__label">stardust</span>
+        <div id="charge-dots" class="charge-dots"></div>
+      </div>
+      <div class="panel__row panel__row--sub">
+        <span id="charge-readout" class="mono">3 / 3 loaded</span>
+      </div>
+      <div id="cooldown-bar-track" class="cooldown-track" hidden>
+        <div id="cooldown-bar-fill" class="cooldown-fill"></div>
+      </div>
+      <div id="status-lock-note" class="status-lock-note" hidden>Sign in with Discord to paint.</div>
+    </div>
+  </div>
+
+  <!-- coordinate / pen readout, follows pointer -->
+  <div id="readout" class="readout" hidden>
+    <span id="readout-xy">000, 000</span>
+    <span id="readout-color" class="readout__swatch"></span>
+  </div>
+
+  <!-- zoom controls -->
+  <div class="zoom-controls">
+    <button id="zoom-in" class="zoom-btn" aria-label="Zoom in">+</button>
+    <button id="zoom-reset" class="zoom-btn zoom-btn--reset" aria-label="Reset view">◎</button>
+    <button id="zoom-out" class="zoom-btn" aria-label="Zoom out">−</button>
+  </div>
+
+  <!-- palette panel -->
+  <div class="panel panel--palette">
+    <div class="panel__label panel__label--top">palette</div>
+    <div id="palette-grid" class="palette-grid"></div>
+  </div>
+
+  <!-- place button (mobile-friendly explicit commit) -->
+  <button id="place-btn" class="place-btn" disabled>
+    <span class="place-btn__label">place pixel</span>
+    <span id="place-btn-coords" class="place-btn__coords mono"></span>
+  </button>
+
+  <!-- activity feed — FPS-style kill feed, stacks newest at the bottom -->
+  <div id="killfeed" class="killfeed"></div>
+
+  <!-- toast for errors -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
